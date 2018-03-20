@@ -35,7 +35,7 @@ const csv2json = (fileName = 'customer-data') => {
 	
 	lineReader.on('close', () => {
 		
-		fs.writeFileSync(fileName + ".json", JSON.stringify(entries) , 'utf-8'); 
+	  fs.writeFileSync(fileName + ".json", JSON.stringify(entries, null, " ") , 'utf-8');
 	})
 }
 
