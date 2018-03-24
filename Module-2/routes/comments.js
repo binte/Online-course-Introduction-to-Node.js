@@ -1,19 +1,19 @@
 const aux = require('./auxiliary.js')
 
-module.exports = function(app, store) {
+module.exports = {
 
-	app.get('/posts/:postId/comments', (req, resp) => {
-		let postId = req.params.postId, post
+	getComments(req, resp, store) {
+		let postId = req.params.id, post
 
 		if( (post = store.posts.find(x => x.id == postId)) === undefined) {
 			return resp.status(500).send({ error : 'Unexistent ID' })
 		}
 		
 		resp.send(post.comments)
-	})
+	},
 	
-	app.post('/posts/:postId/comments', (req, resp) => {
-		let postId = req.params.postId, post
+	addComment(req, resp, store) {
+		let postId = req.params.id, post
 
 		if( (post = store.posts.find(x => x.id == postId)) === undefined) {
 			return resp.status(500).send({ error : 'Unexistent ID' })
@@ -38,9 +38,9 @@ module.exports = function(app, store) {
 		post.comments.push(obj)
 		console.log('added comment', post)
 		resp.sendStatus(204)
-	})
+	},
 	
-	app.put('/posts/:postId/comments/:commentId', (req, resp) => {
+	updateComment(req, resp, store) {
 		
 		let postId = req.params.postId, post, commentId = req.params.commentId, comment
 
@@ -65,9 +65,9 @@ module.exports = function(app, store) {
 		
 		console.log('comment updated', post)
 		resp.sendStatus(204)
-	})
+	},
 	
-	app.delete('/posts/:postId/comments/:commentId', (req, resp) => {
+	removeComment(req, resp, store) {
 		
 		let postId = req.params.postId, post, commentId = req.params.commentId
 
@@ -82,5 +82,5 @@ module.exports = function(app, store) {
 		post.comments = post.comments.filter(function(obj) { return obj.id != commentId })
 		console.log("comment deleted")
 		resp.status(204).json()
-	})
+	}
 }

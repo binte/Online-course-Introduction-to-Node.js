@@ -2,7 +2,7 @@
 curl -H "Content-Type: application/json" -d "{\"user\": \"Manel\", \"title\":\"Testing\", \"content\":\"I am testing\"}" -iv -X POST "http://localhost:3000/posts"
 
 ::posts a post with one comment
-curl -H "Content-Type: application/json" -d "{\"user\": \"Manel\", \"title\":\"Testing\", \"content\":\"I am testing\", \"comments\":[{\"text\":\"escaxe\"}]}" -iv -X POST "http://localhost:3000/posts"
+curl -H "Content-Type: application/json" -d "{\"user\": \"Manecas\", \"title\":\"Manecas is testing\", \"content\":\"I, Manecas, am testing\", \"comments\":[{\"text\":\"escaxe\"}]}" -iv -X POST "http://localhost:3000/posts"
 
 ::posts a post with a comment that doesn't have the proper format : ERROR
 curl -H "Content-Type: application/json" -d "{\"user\": \"Manel\", \"title\":\"Testing\", \"content\":\"I am testing\", \"comments\":[{\"texto\":\"escaxe\"}]}" -iv -X POST "http://localhost:3000/posts"

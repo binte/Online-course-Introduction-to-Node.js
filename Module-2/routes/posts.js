@@ -1,8 +1,8 @@
 const aux = require('./auxiliary.js')
 
-module.exports = (function(app, store) { 
+module.exports = { 
 	
-	app.get('/posts', (req, resp) => {
+	getPosts(req, resp, store) {
 		let postId = req.query.id, post
 
 		if(postId) {
@@ -15,9 +15,9 @@ module.exports = (function(app, store) {
 		}
 		
 		resp.json(store.posts)
-	})
+	},
 	
-	app.post('/posts', (req, resp) => {
+	addPost(req, resp, store) {
 		// Only accepts posts containing user, title and content
 		if( req.body.user === undefined || req.body.title === undefined || req.body.content === undefined ||
 			!req.body.user.trim() || !req.body.title.trim() || !req.body.content.trim()) {
@@ -70,9 +70,9 @@ module.exports = (function(app, store) {
 		store.posts.push(obj)
 		console.log('created', obj)
 		resp.sendStatus(204)
-	})
+	},
 
-	app.put('/posts/:id', (req, resp) => {
+	updatePost(req, resp, store) {
 		
 		let postId = req.params.id, post
 		if( (post = store.posts.find(x => x.id == postId)) === undefined) {
@@ -82,9 +82,9 @@ module.exports = (function(app, store) {
 		Object.assign(post, req.body)
 		console.log("updated", post)
 		resp.sendStatus(204)
-	})
+	},
 	
-	app.delete('/posts/:id', (req, resp) => {
+	removePost(req, resp, store) {
 			
 		let postId = req.params.id, post
 		if( (post = store.posts.find(x => x.id == postId)) === undefined) {
@@ -94,5 +94,5 @@ module.exports = (function(app, store) {
 		store.posts = store.posts.filter(function(obj) { return obj.id != postId })
 		console.log("deleted")
 		resp.status(204).json()
-	})
-})
+	}
+}
