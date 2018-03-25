@@ -2,22 +2,22 @@ const aux = require('./auxiliary.js')
 
 module.exports = { 
 	
-	getPosts(req, resp, store) {
+	getPosts(req, resp) {
 		let postId = req.query.id, post
 
 		if(postId) {
 		
-			if( (post = store.posts.find(x => x.id == postId)) === undefined) {
+			if( (post = req.store.posts.find(x => x.id == postId)) === undefined) {
 				return resp.status(500).json({ error : 'Unexistent ID' })
 			}
 
 			return resp.json(post)			
 		}
 		
-		resp.json(store.posts)
+		resp.status(200).json(req.store.posts)
 	},
 	
-	addPost(req, resp, store) {
+	addPost(req, resp) {
 		// Only accepts posts containing user, title and content
 		if( req.body.user === undefined || req.body.title === undefined || req.body.content === undefined ||
 			!req.body.user.trim() || !req.body.title.trim() || !req.body.content.trim()) {
@@ -25,7 +25,7 @@ module.exports = {
 		}
 		
 		let obj = {
-			id : aux.nextId(store.posts),
+			id : aux.nextId(req.store.posts),
 			user : req.body.user,
 			date : new Date(),
 			title : req.body.title,
@@ -67,15 +67,15 @@ module.exports = {
 			}
 		}
 		
-		store.posts.push(obj)
+		req.store.posts.push(obj)
 		console.log('created', obj)
 		resp.sendStatus(204)
 	},
 
-	updatePost(req, resp, store) {
+	updatePost(req, resp) {
 		
 		let postId = req.params.id, post
-		if( (post = store.posts.find(x => x.id == postId)) === undefined) {
+		if( (post = req.store.posts.find(x => x.id == postId)) === undefined) {
 			return resp.status(500).json({ error : 'Unexistent ID' })
 		}
 		
@@ -84,14 +84,14 @@ module.exports = {
 		resp.sendStatus(204)
 	},
 	
-	removePost(req, resp, store) {
+	removePost(req, resp) {
 			
 		let postId = req.params.id, post
-		if( (post = store.posts.find(x => x.id == postId)) === undefined) {
+		if( (post = req.store.posts.find(x => x.id == postId)) === undefined) {
 			return resp.status(500).json({ error : 'Unexistent ID' })
 		}
 		
-		store.posts = store.posts.filter(function(obj) { return obj.id != postId })
+		req.store.posts = req.store.posts.filter(function(obj) { return obj.id != postId })
 		console.log("deleted")
 		resp.status(204).json()
 	}

@@ -14,7 +14,7 @@ curl -iv "http://localhost:3000/posts"
 curl -iv "http://localhost:3000/posts?id=0"
 
 ::updates account data at a specified id
-curl -H "Content-Type: application/json" -d "{\"title\": \"Still testing\"}" -iv -X PUT "http://localhost:3000/posts/1" 
+curl -H "Content-Type: application/json" -d "{\"title\": \"Still testing\"}" -iv -X PUT "http://localhost:3000/posts/1"
 
 ::deletes entry with a specified id
 curl -iv -X DELETE "http://localhost:3000/posts/1"
