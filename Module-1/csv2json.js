@@ -11,7 +11,12 @@ const csv2json = (fileName = 'customer-data') => {
 	  input: fs.createReadStream(fileName + ".csv")
 	});
 
-	lineReader.on('line', (line, callback) => {
+	lineReader.on('line', (line) => {
+	  
+	  if (!line.trim()) {
+		// is empty or whitespace
+		return;
+	  }
 	  
 	  if(count == 0) {  // First line
 		
