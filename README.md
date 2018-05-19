@@ -16,9 +16,9 @@ node csv2json.js
 ### Objective
 The goal is to put into practice the acquired knowledge in the Express module by setting up a small server that can manage requests to:
 
-add, update, delete posts
+fetch, add, update, delete posts
 
-add, update, delete comments to each post
+fetch, add, update, delete comments to each post
 
 ### Instructions
 Clone the repository (or simply download it) with the command git clone https://github.com/binte/Online-course-Introduction-to-Node.js/tree/master/Module-2
