@@ -1,3 +1,4 @@
+const filters = require('./filters.js')
 const aux = require('./auxiliary.js')
 
 module.exports = { 
@@ -8,9 +9,8 @@ module.exports = {
 		if(postId) {
 		
 			if( (post = req.store.posts.find(x => x.id == postId)) === undefined) {
-				return resp.status(500).json({ error : 'Unexistent ID' })
+				return resp.status(404).json({ error : 'Unexistent ID' })
 			}
-
 			return resp.json(post)			
 		}
 		
@@ -33,7 +33,7 @@ module.exports = {
 			comments : []
 		}
 		
-		/* If there's no comments, the new post will have an empty array in the comments parameter 
+		/* If there are no comments, the new post will have an empty array in the comments parameter 
 		 * Otherwise validates the comments before accepting them as a parameter
 		 */
 		if( ! (req.body.comments === undefined) ) {
@@ -66,7 +66,6 @@ module.exports = {
 				}
 			}
 		}
-		
 		req.store.posts.push(obj)
 		console.log('created', obj)
 		resp.sendStatus(204)
@@ -74,24 +73,24 @@ module.exports = {
 
 	updatePost(req, resp) {
 		
-		let postId = req.params.id, post
-		if( (post = req.store.posts.find(x => x.id == postId)) === undefined) {
-			return resp.status(500).json({ error : 'Unexistent ID' })
+		try {
+			let post = filters.filterPosts(req, resp)
+			Object.assign(post, req.body)
+			console.log("updated", post)
+		} catch(err) {
+			return resp.status(404).json({ error : err })
 		}
-		
-		Object.assign(post, req.body)
-		console.log("updated", post)
 		resp.sendStatus(204)
 	},
 	
 	removePost(req, resp) {
 			
-		let postId = req.params.id, post
-		if( (post = req.store.posts.find(x => x.id == postId)) === undefined) {
-			return resp.status(500).json({ error : 'Unexistent ID' })
+		try {
+			let post = filters.filterPosts(req, resp)
+			req.store.posts = req.store.posts.filter(function(obj) { return obj.id != post.id })
+		} catch (err) {
+			return resp.status(404).json({ error : err })
 		}
-		
-		req.store.posts = req.store.posts.filter(function(obj) { return obj.id != postId })
 		console.log("deleted")
 		resp.status(204).json()
 	}
