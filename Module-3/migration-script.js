@@ -10,6 +10,8 @@ const db = monk('localhost:27017/bitcoinAgency', (err) => {
   }
 })
 
+let collection = db.get('Customers')
+
 const tryParseInt = function(val, radix)
 {
     try
@@ -37,15 +39,14 @@ const tryParseInt = function(val, radix)
 const insertMany = function(objs, callback) {
   
   try {
-    let collection = db.get('Customers'), resultsArray = '', nObjs = objs.length, objsProcessed = 0
+    let nObjs = objs.length, objsProcessed = 0
 
     objs.forEach(obj => {
       collection.insert(obj, (error, r) => {
         objsProcessed++
         if (error) { callback(error, null) }
-        resultsArray+=("successfully inserted object with id " + obj.id + "\n")
         if(objsProcessed === nObjs) {
-          callback(null, resultsArray)
+          callback(null, objsProcessed)
         }
       })
     })
@@ -71,32 +72,39 @@ const migrate = (entriesPerQuery = 1, customerData = 'm3-customer-data.json', cu
         
         let jsonAddresses = JSON.parse(addressData), l=json.length, its=Math.floor(l / entriesPerQuery), rest=0
   
-        if( (rest = l%entriesPerQuery) != 0) its++
-  
-        let tasks = [], resultsArray = ''
-        for (let i = 0; i < its; i++) { 
-  
-          let objs = []
-          for (let k = i*entriesPerQuery, j=0; j < ( (rest>0 && i==its-1) ? rest : entriesPerQuery); k++, j++) {
-            objs.push(Object.assign(json[k], jsonAddresses[k]))
-          }
-  
-          tasks.push(
-            function(callback) { insertMany(objs, (insertError, results) => {
-                if (insertError) callback(insertError, null)
-                callback(null, results)
+        // Clear database
+        collection.remove({}, (removeErr, removeRes) => {
+          if(removeErr) { throw removeErr }
+
+          if( (rest = l%entriesPerQuery) != 0) its++
+
+          let tasks = [], resultsArray = ''
+          for (let i = 0; i < its; i++) { 
+    
+            let objs = []
+            for (let k = i*entriesPerQuery, j=0; j < ( (rest>0 && i==its-1) ? rest : entriesPerQuery); k++, j++) {
+              objs.push(Object.assign(json[k], jsonAddresses[k]))
+            }
+    
+            tasks.push(
+              function(callback) { insertMany(objs, (insertError, results) => {
+                  if (insertError) callback(insertError, null)
+                  callback(null, results)
+                })
               })
-            })
-        }
-  
-        async.parallel(tasks, (taskError, finalResults) => {
-          if (taskError) {
-            throw taskError
           }
-          console.log(finalResults.join(""))
-          process.exit(0)
+    
+          console.time("dbsave")
+          async.parallel(tasks, (taskError, objsProcessed) => {
+            if (taskError) {
+              throw taskError
+            }
+            console.timeEnd("dbsave")
+            console.log('Successfully inserted ' + objsProcessed.reduce((a, b) => a+b) + ' entries')
+            process.exit(0)
+          })
         })
-      })
+      })  
     })
   }
   catch(error) {
