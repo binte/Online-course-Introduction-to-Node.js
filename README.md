@@ -54,3 +54,22 @@ Finally, run the command (where X is the number of insertions to be executed by 
 ```
 node .\migration-script.js X
 ```
+
+## Module 4 
+### Objective
+Set up a small server with the help of the Express module and using mongoose, that can manage requests to:
+
+fetch, add, update, delete accounts
+
+### Instructions
+Clone the repository (or simply download it) with the command git clone https://github.com/binte/Online-course-Introduction-to-Node.js/tree/master/Module-4
+
+Install the dependencies by cd..ing to the root directory and then executing: 
+```
+npm install
+```
+
+Start the server: 
+```
+npm start
+```
