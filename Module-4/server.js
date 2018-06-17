@@ -1,13 +1,13 @@
 const bodyParser = require('body-parser')
 const express = require('express')
-// const logger = require('morgan')
+const logger = require('morgan')
 const mongoose = require('mongoose')
 
 const Account = mongoose.model('Account', { name: String, balance: Number })
 
 const app = express()
 app.use(bodyParser.json())
-// app.use(logger('dev'))
+app.use(logger('dev'))
 
 app.use((req, resp, next) => {
 	
