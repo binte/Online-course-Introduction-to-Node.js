@@ -1,12 +1,12 @@
 //filter functions to validate input
 module.exports = {
-    filterAccounts : function(req, id, callback) {
-        this.filterObjectId(req, id, (errFilter, accountId) => {
+    filterAccounts : function(Account, mongoose, id, callback) {
+        this.filterObjectId(mongoose, id, (errFilter, accountId) => {
             try {
                 if(errFilter) {
                     return callback(errFilter, null)
                 }
-                req.accounts.findOne({'_id': accountId}, (error, account) => {
+                Account.findById(accountId, (error, account) => {
                     if (error) {
                         return callback(error, null)
                     } 
@@ -23,9 +23,9 @@ module.exports = {
             }
         })
     },
-    filterObjectId : function (req, id, callback) {
+    filterObjectId : function (mongoose, id, callback) {
         try {
-            return callback(null, req.mongoose.Types.ObjectId(id))
+            return callback(null, mongoose.Types.ObjectId(id))
         }
         catch(err) {
             return callback('Invalid ID', null)
