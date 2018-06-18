@@ -1,17 +1,22 @@
+const mongoose = require('mongoose')
 const filters = require('./filters.js')
+
+const Account = mongoose.model('Account', { name: String, balance: Number })
+
+mongoose.connect('mongodb://localhost:27017/accounts')
 
 module.exports = { 
 	getAccounts(req, resp) {
         try {
             let id = req.query.id
             if(id !== undefined) {
-                filters.filterAccounts(req, id, (error, account) => {
+                filters.filterAccounts(Account, mongoose, id, (error, account) => {
                     if(error) return resp.status(404).send(error.toString())
                     return resp.json(account)
                 })
             }
             else {
-                req.accounts.find({}, ({}, {}, function(findError, accounts){
+                Account.find((function(findError, accounts){
                     if (findError) return resp.status(404).send(findError.toString())
                     return resp.json(accounts)
                 }))
@@ -27,14 +32,14 @@ module.exports = {
             if( req.body.name === undefined || !req.body.name.trim() ) {
                 return resp.status(400).send('JSON not correctly formed : post missing mandatory parameters')
             }
-            
-            let obj = {
-                name : req.body.name,
-                balance : (req.body.balance !== undefined) ? parseInt(req.body.balance, 10) : 0
+
+            if( req.body.balance === undefined || !req.body.balance.trim() ) {
+                req.body.balance = 0
             }
-            
-            req.accounts.create(obj, (createError, doc) => {
-                if (createError) return resp.status(404).send(createError.toString())
+
+            let account = new Account(req.body)
+            account.save((saveError, doc) => {
+                if (saveError) return resp.status(404).send(saveError.toString())
 
                 return resp.json(doc)
             })
@@ -45,30 +50,28 @@ module.exports = {
     },
     updateAccount(req, resp) {
         try {
-			filters.filterAccounts(req, req.params.id, (error, account) => {
+			filters.filterAccounts(Account, mongoose, req.params.id, (error, account) => {
 				if(error) return resp.status(404).send(error.toString())
 
-				let accounts = req.accounts
-				accounts.update(account, {$set: req.body}, (errUpd, results) => {
-					  if (errUpd) return resp.status(404).send(errUpd.toString())
-					  
-					  console.log("updated", account)
-					  resp.sendStatus(204)
-					})
+				account.update(req.body, (errUpd, results) => {
+                    if (errUpd) return resp.status(404).send(errUpd.toString())
+                    
+                    console.log("updated", account)
+                    resp.sendStatus(204)
+                  })
 			 })
-		} 
+		}
 		catch(err) {
 			return resp.status(404).send(err.toString())
 		}
     },
     removeAccount(req, resp) {
         try {
-			filters.filterAccounts(req, req.params.id, (errFilter, account) => {
+			filters.filterAccounts(Account, mongoose, req.params.id, (errFilter, account) => {
 				if(errFilter) return resp.status(404).send(errFilter.toString())
 
-				let accounts = req.accounts
-				accounts.remove(account, (error, results) => {
-					if (error) return resp.status(404).send(errUpd)
+				account.remove( (error) => {
+					if (error) return resp.status(404).send(error)
 					
 					console.log("removed", account)
 					return resp.status(204).json()
